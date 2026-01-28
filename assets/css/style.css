@@ -1,0 +1,122 @@
+/* Reset & base styles */
+* {
+    box-sizing: border-box;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+body {
+    background-color: #f4f6f8;
+    margin: 0;
+    padding: 20px;
+    color: #333;
+}
+
+/* Headings */
+h2 {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+/* Links */
+a {
+    color: #0077cc;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+/* Buttons */
+button {
+    background-color: #0077cc;
+    color: #fff;
+    border: none;
+    padding: 8px 14px;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+button:hover {
+    background-color: #005fa3;
+}
+
+/* Forms */
+form {
+    background: #fff;
+    max-width: 400px;
+    margin: 20px auto;
+    padding: 20px;
+    border-radius: 6px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+form input,
+form select {
+    width: 100%;
+    padding: 8px;
+    margin: 6px 0 14px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+/* Search bar */
+#search {
+    width: 100%;
+    max-width: 400px;
+    padding: 8px;
+    margin: 10px auto 20px;
+    display: block;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+/* Table styles */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fff;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+th, td {
+    padding: 10px;
+    text-align: left;
+}
+
+th {
+    background-color: #0077cc;
+    color: #fff;
+}
+
+tr:nth-child(even) {
+    background-color: #f2f2f2;
+}
+
+/* Low stock warning (optional) */
+.low-stock {
+    background-color: #ffe0e0 !important;
+    color: #b30000;
+    font-weight: bold;
+}
+
+/* Action links */
+td a {
+    margin-right: 8px;
+}
+
+/* Responsive table (basic) */
+@media (max-width: 600px) {
+    table, thead, tbody, th, td, tr {
+        display: block;
+    }
+
+    th {
+        display: none;
+    }
+
+    td {
+        padding: 10px;
+        border-bottom: 1px solid #ddd;
+    }
+}

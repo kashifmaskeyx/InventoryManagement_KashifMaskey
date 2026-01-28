@@ -1,28 +1,26 @@
-<?php
-require '../config/db.php';
+<?php require '../config/db.php';
+
 $id = $_GET['id'];
 
-
-$stmt = $pdo->prepare("SELECT * FROM products WHERE id=?");
-$stmt->execute([$id]);
-$p = $stmt->fetch();
-
-
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-
-	$stmt = $pdo->prepare("UPDATE products SET name=?, category=?, quantity=?, price=? WHERE id=?");
-	$stmt->execute([
-		$_POST['name'], $_POST['category'], $_POST['quantity'], $_POST['price'], $id
-	]);
-header("Location: index.php");
+    $stmt = $pdo->prepare("UPDATE products SET name=?, category=?, quantity=?, price=? WHERE id=?");
+    $stmt->execute([
+        $_POST['name'], $_POST['category'], $_POST['quantity'], $_POST['price'], $id
+    ]);
+    header("Location: index.php");
+    exit;
 }
+
+$product = $pdo->prepare("SELECT * FROM products WHERE id=?");
+$product->execute([$id]);
+$p = $product->fetch();
 ?>
-
-
+<head><link rel="stylesheet" href="../assets/css/style.css">
+</head>
 <form method="post">
-<input name="name" value="<?= htmlspecialchars($p['name']) ?>"><br>
-<input name="category" value="<?= htmlspecialchars($p['category']) ?>"><br>
-<input name="quantity" value="<?= $p['quantity'] ?>"><br>
-<input name="price" value="<?= $p['price'] ?>"><br>
-<button>Update</button>
+    Name: <input name="name" value="<?= htmlspecialchars($p['name']) ?>"><br>
+    Category: <input name="category" value="<?= htmlspecialchars($p['category']) ?>"><br>
+    Quantity: <input name="quantity" value="<?= $p['quantity'] ?>"><br>
+    Price: <input name="price" value="<?= $p['price'] ?>"><br>
+    <button>Update</button>
 </form>
