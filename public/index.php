@@ -1,7 +1,15 @@
 <?php
 session_start();
 
-/* If user is NOT logged in, send them to welcome page */
+if (!isset($_SESSION['user'])) {
+    header('Location: welcome.php');
+    exit;
+}
+
+header('Location: dashboard.php');
+exit;
+
+
 if (!isset($_SESSION['user'])) {
     header('Location: welcome.php');
     exit;
