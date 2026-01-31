@@ -1,47 +1,46 @@
-<?php require '../config/db.php'; ?>
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Inventory System</title>
-    <script src="../assets/js/search.js" defer></script>
-    <link rel="stylesheet" href="../assets/css/style.css">
+<?php
+session_start();
 
-</head>
-<body>
+/* If user is NOT logged in, send them to welcome page */
+if (!isset($_SESSION['user'])) {
+    header('Location: welcome.php');
+    exit;
+}
 
-<h2>Inventory & Stock Tracking</h2>
-<a href="add.php">Add Product</a><br><br>
+require '../config/db.php';
+require '../templates/header.php';
+?>
 
-<input type="text" id="search" placeholder="Search products...">
+<h2>Products</h2>
 
-<table border="1" width="100%">
+<a class="btn" href="add.php">+ Add Product</a>
+
+<input id="search" placeholder="Search...">
+
+<table>
+<thead>
 <tr>
     <th>Name</th>
-    <th>Category</th>
-    <th>Supplier</th>
     <th>Qty</th>
     <th>Price</th>
     <th>Actions</th>
 </tr>
+</thead>
 <tbody id="results">
-<?php
-$stmt = $pdo->query("SELECT products.*, suppliers.name AS supplier
-    FROM products JOIN suppliers ON products.supplier_id = suppliers.id");
-foreach ($stmt as $row): ?>
+<?php foreach ($pdo->query("SELECT * FROM products") as $p): ?>
 <tr>
-    <td><?= htmlspecialchars($row['name']) ?></td>
-    <td><?= htmlspecialchars($row['category']) ?></td>
-    <td><?= htmlspecialchars($row['supplier']) ?></td>
-    <td><?= $row['quantity'] ?></td>
-    <td><?= $row['price'] ?></td>
+    <td><?= htmlspecialchars($p['name']) ?></td>
+    <td><?= $p['quantity'] ?></td>
+    <td><?= $p['price'] ?></td>
     <td>
-        <a href="edit.php?id=<?= $row['id'] ?>">Edit</a> |
-        <a href="delete.php?id=<?= $row['id'] ?>" onclick="return confirm('Delete?')">Delete</a>
+        <a href="edit.php?id=<?= $p['id'] ?>">Edit</a> |
+        <a href="delete.php?id=<?= $p['id'] ?>" onclick="return confirm('Delete this product?')">Delete</a>
     </td>
 </tr>
 <?php endforeach; ?>
 </tbody>
 </table>
 
-</body>
-</html>
+<script src="../assets/js/search.js"></script>
+
+<?php require '../templates/footer.php'; ?>
