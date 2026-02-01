@@ -6,14 +6,7 @@ if (!isset($_SESSION['user'])) {
     exit;
 }
 
-header('Location: dashboard.php');
-exit;
 
-
-if (!isset($_SESSION['user'])) {
-    header('Location: welcome.php');
-    exit;
-}
 
 require '../config/db.php';
 require '../templates/header.php';

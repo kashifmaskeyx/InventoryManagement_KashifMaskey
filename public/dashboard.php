@@ -8,73 +8,67 @@ if (!isset($_SESSION['user'])) {
 require '../config/db.php';
 require '../templates/header.php';
 
+// Stats
 $totalProducts = $pdo->query("SELECT COUNT(*) FROM products")->fetchColumn();
+$totalSuppliers = $pdo->query("SELECT COUNT(*) FROM suppliers")->fetchColumn();
 $lowStock = $pdo->query("SELECT COUNT(*) FROM products WHERE quantity < 5")->fetchColumn();
-$totalStock = $pdo->query("SELECT SUM(quantity) FROM products")->fetchColumn();
+$totalValue = $pdo->query("SELECT SUM(quantity * price) FROM products")->fetchColumn();
 ?>
 
-<div class="dashboard-header">
-    <h1>Welcome, <?= htmlspecialchars($_SESSION['user']) ?> 👋</h1>
-    <p>Here’s what’s happening in your inventory today</p>
-</div>
+<h1>Dashboard</h1>
+<p class="subtitle">Welcome back, <?= htmlspecialchars($_SESSION['user']) ?> 👋</p>
 
-<!-- KPI CARDS -->
-<div class="dashboard-cards">
-    <div class="dash-card">
-        <h4>Total Products</h4>
-        <span><?= $totalProducts ?></span>
+<div class="stats">
+    <div class="stat-card">
+        <h3>Total Products</h3>
+        <p><?= $totalProducts ?></p>
     </div>
-
-    <div class="dash-card">
-        <h4>Total Stock Units</h4>
-        <span><?= $totalStock ?? 0 ?></span>
+    <div class="stat-card">
+        <h3>Suppliers</h3>
+        <p><?= $totalSuppliers ?></p>
     </div>
-
-    <div class="dash-card alert">
-        <h4>Low Stock Items</h4>
-        <span><?= $lowStock ?></span>
+    <div class="stat-card warning">
+        <h3>Low Stock</h3>
+        <p><?= $lowStock ?></p>
     </div>
-</div>
-
-<!-- QUICK ACTIONS -->
-<div class="section">
-    <h2>Quick Actions</h2>
-    <div class="quick-actions">
-        <a class="btn" href="add.php">➕ Add Product</a>
-        <a class="btn secondary" href="index.php">📦 Manage Inventory</a>
-        <a class="btn secondary" href="logout.php">🚪 Logout</a>
+    <div class="stat-card">
+        <h3>Total Stock Value</h3>
+        <p>$<?= number_format($totalValue ?? 0, 2) ?></p>
     </div>
 </div>
 
-<!-- LOW STOCK TABLE -->
-<div class="section">
-    <h2>Low Stock Alerts</h2>
-
-    <?php
-    $stmt = $pdo->query("SELECT name, quantity FROM products WHERE quantity < 5");
-    if ($stmt->rowCount() === 0):
-    ?>
-        <p class="success">✅ All products are sufficiently stocked.</p>
-    <?php else: ?>
+<div class="dashboard-grid">
+    <div class="panel">
+        <h3>⚠ Low Stock Alerts</h3>
         <table>
-            <thead>
-                <tr>
-                    <th>Product</th>
-                    <th>Quantity</th>
-                    <th>Status</th>
-                </tr>
-            </thead>
-            <tbody>
-            <?php foreach ($stmt as $row): ?>
-                <tr>
-                    <td><?= htmlspecialchars($row['name']) ?></td>
-                    <td><?= $row['quantity'] ?></td>
-                    <td><span class="badge danger">Low Stock</span></td>
-                </tr>
+            <tr><th>Product</th><th>Qty</th></tr>
+            <?php
+            $stmt = $pdo->query("SELECT name, quantity FROM products WHERE quantity < 5");
+            foreach ($stmt as $p):
+            ?>
+            <tr>
+                <td><?= htmlspecialchars($p['name']) ?></td>
+                <td class="danger"><?= $p['quantity'] ?></td>
+            </tr>
             <?php endforeach; ?>
-            </tbody>
         </table>
-    <?php endif; ?>
+    </div>
+
+    <div class="panel">
+        <h3>🕒 Recently Added</h3>
+        <table>
+            <tr><th>Product</th><th>Qty</th></tr>
+            <?php
+            $stmt = $pdo->query("SELECT name, quantity FROM products ORDER BY id DESC LIMIT 5");
+            foreach ($stmt as $p):
+            ?>
+            <tr>
+                <td><?= htmlspecialchars($p['name']) ?></td>
+                <td><?= $p['quantity'] ?></td>
+            </tr>
+            <?php endforeach; ?>
+        </table>
+    </div>
 </div>
 
 <?php require '../templates/footer.php'; ?>

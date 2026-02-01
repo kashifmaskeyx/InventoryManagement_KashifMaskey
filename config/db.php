@@ -12,9 +12,12 @@ try {
 
     $pdo->exec("CREATE TABLE IF NOT EXISTS users (
         id INT AUTO_INCREMENT PRIMARY KEY,
-        username VARCHAR(50) UNIQUE,
-        password VARCHAR(255)
+        username VARCHAR(50) UNIQUE NOT NULL,
+        email VARCHAR(100) UNIQUE NOT NULL,
+        password VARCHAR(255) NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )");
+
 
     $pdo->exec("CREATE TABLE IF NOT EXISTS suppliers (
         id INT AUTO_INCREMENT PRIMARY KEY,
@@ -31,9 +34,19 @@ try {
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )");
 
-    if ($pdo->query("SELECT COUNT(*) FROM users")->fetchColumn() == 0) {
+     $count = $pdo->query("SELECT COUNT(*) FROM users")->fetchColumn();
+    if ($count == 0) {
         $hash = password_hash('admin', PASSWORD_DEFAULT);
-        $pdo->prepare("INSERT INTO users (username,password) VALUES ('admin',?)")->execute([$hash]);
+
+        $stmt = $pdo->prepare("
+            INSERT INTO users (username, email, password)
+            VALUES (?, ?, ?)
+        ");
+        $stmt->execute([
+            'admin',
+            'admin@example.com',
+            $hash
+        ]);
     }
 
 } catch (PDOException $e) {
