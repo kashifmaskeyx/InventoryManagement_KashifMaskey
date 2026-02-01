@@ -34,7 +34,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <h2>Login</h2>
     <form method="post">
         <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
-        <label>Username or Email</label>
+        <label>Username</label>
         <input name="login" required>
         <label>Password</label>
         <input type="password" name="password" required>
