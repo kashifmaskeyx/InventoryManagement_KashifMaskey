@@ -3,25 +3,37 @@ session_start();
 require '../config/db.php';
 require '../templates/header.php';
 
+$error = '';
+
 if (empty($_SESSION['csrf_token'])) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+
+    // CSRF check
     if (!hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'])) {
         die("Invalid CSRF token");
     }
 
     $username = trim($_POST['username']);
     $email = filter_var($_POST['email'], FILTER_VALIDATE_EMAIL);
-    $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
+    $password = $_POST['password']; // raw password
 
+    // Server-side validation
     if (!$email) {
         $error = "Invalid email address";
+    } elseif (!preg_match('/^(?=.*\d).{8,}$/', $password)) {
+        $error = "Password must be at least 8 characters long and contain at least one number.";
     } else {
+        $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
+
         try {
-            $stmt = $pdo->prepare("INSERT INTO users (username, email, password) VALUES (?, ?, ?)");
-            $stmt->execute([$username, $email, $password]);
+            $stmt = $pdo->prepare(
+                "INSERT INTO users (username, email, password) VALUES (?, ?, ?)"
+            );
+            $stmt->execute([$username, $email, $hashedPassword]);
+
             header("Location: login.php");
             exit;
         } catch (PDOException $e) {
