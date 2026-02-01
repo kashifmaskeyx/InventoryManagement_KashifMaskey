@@ -1,21 +1,20 @@
 <?php
 session_start();
-
 if (!isset($_SESSION['user'])) {
     header('Location: welcome.php');
     exit;
 }
-
-
-
 require '../config/db.php';
 require '../templates/header.php';
+
+// Get products for logged-in user
+$stmt = $pdo->prepare("SELECT * FROM products WHERE user_id = ?");
+$stmt->execute([$_SESSION['user_id']]);
+$products = $stmt->fetchAll();
 ?>
 
 <h2>Products</h2>
-
 <a class="btn" href="add.php">+ Add Product</a>
-
 <input id="search" placeholder="Search...">
 
 <table>
@@ -28,7 +27,7 @@ require '../templates/header.php';
 </tr>
 </thead>
 <tbody id="results">
-<?php foreach ($pdo->query("SELECT * FROM products") as $p): ?>
+<?php foreach ($products as $p): ?>
 <tr>
     <td><?= htmlspecialchars($p['name']) ?></td>
     <td><?= $p['quantity'] ?></td>
@@ -43,5 +42,4 @@ require '../templates/header.php';
 </table>
 
 <script src="../assets/js/search.js"></script>
-
 <?php require '../templates/footer.php'; ?>

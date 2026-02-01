@@ -1,6 +1,8 @@
 <?php
 session_start();
-if (!isset($_SESSION['user'])) {
+
+// Ensure user is logged in and has user_id
+if (!isset($_SESSION['user']) || !isset($_SESSION['user_id'])) {
     header('Location: welcome.php');
     exit;
 }
@@ -8,11 +10,20 @@ if (!isset($_SESSION['user'])) {
 require '../config/db.php';
 require '../templates/header.php';
 
-// Stats
-$totalProducts = $pdo->query("SELECT COUNT(*) FROM products")->fetchColumn();
-$totalSuppliers = $pdo->query("SELECT COUNT(*) FROM suppliers")->fetchColumn();
-$lowStock = $pdo->query("SELECT COUNT(*) FROM products WHERE quantity < 5")->fetchColumn();
-$totalValue = $pdo->query("SELECT SUM(quantity * price) FROM products")->fetchColumn();
+// Stats filtered by current user
+$user_id = $_SESSION['user_id'];
+
+$totalProducts = $pdo->prepare("SELECT COUNT(*) FROM products WHERE user_id = ?");
+$totalProducts->execute([$user_id]);
+$totalProducts = $totalProducts->fetchColumn();
+
+$lowStock = $pdo->prepare("SELECT COUNT(*) FROM products WHERE quantity < 5 AND user_id = ?");
+$lowStock->execute([$user_id]);
+$lowStock = $lowStock->fetchColumn();
+
+$totalValue = $pdo->prepare("SELECT SUM(quantity * price) FROM products WHERE user_id = ?");
+$totalValue->execute([$user_id]);
+$totalValue = $totalValue->fetchColumn();
 ?>
 
 <h1>Dashboard</h1>
@@ -22,10 +33,6 @@ $totalValue = $pdo->query("SELECT SUM(quantity * price) FROM products")->fetchCo
     <div class="stat-card">
         <h3>Total Products</h3>
         <p><?= $totalProducts ?></p>
-    </div>
-    <div class="stat-card">
-        <h3>Suppliers</h3>
-        <p><?= $totalSuppliers ?></p>
     </div>
     <div class="stat-card warning">
         <h3>Low Stock</h3>
@@ -37,13 +44,17 @@ $totalValue = $pdo->query("SELECT SUM(quantity * price) FROM products")->fetchCo
     </div>
 </div>
 
+<!-- =========================
+     DASHBOARD PANELS (unchanged)
+========================= -->
 <div class="dashboard-grid">
     <div class="panel">
         <h3>⚠ Low Stock Alerts</h3>
         <table>
             <tr><th>Product</th><th>Qty</th></tr>
             <?php
-            $stmt = $pdo->query("SELECT name, quantity FROM products WHERE quantity < 5");
+            $stmt = $pdo->prepare("SELECT name, quantity FROM products WHERE quantity < 5 AND user_id = ?");
+            $stmt->execute([$user_id]);
             foreach ($stmt as $p):
             ?>
             <tr>
@@ -59,7 +70,8 @@ $totalValue = $pdo->query("SELECT SUM(quantity * price) FROM products")->fetchCo
         <table>
             <tr><th>Product</th><th>Qty</th></tr>
             <?php
-            $stmt = $pdo->query("SELECT name, quantity FROM products ORDER BY id DESC LIMIT 5");
+            $stmt = $pdo->prepare("SELECT name, quantity FROM products WHERE user_id = ? ORDER BY id DESC LIMIT 5");
+            $stmt->execute([$user_id]);
             foreach ($stmt as $p):
             ?>
             <tr>

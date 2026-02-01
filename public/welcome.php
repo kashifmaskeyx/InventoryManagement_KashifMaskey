@@ -1,25 +1,22 @@
-<?php session_start(); if(isset($_SESSION['user'])) header('Location: dashboard.php'); ?>
-<!DOCTYPE html>
+<?php
+session_start();
+if (isset($_SESSION['user'])) {
+    header("Location: dashboard.php");
+    exit;
+}
+require '../templates/header.php';
+?>
 
-<html>
+<div class="welcome-container">
+    <div class="welcome-content">
+        <h1>Inventory & Stock Management</h1>
+        <p>Track your products, manage stock levels, and get alerts on low inventory – all in one simple system.</p>
 
-    <head>
-        <title>Welcome | Inventory System</title>
-        <link rel="stylesheet" href="../assets/css/style.css">
-    </head>
-
-    <body>
-        <div class="container center">
-
-            <h1>Welcome to Inventory System</h1>
-            <p>Manage products, suppliers and stock efficiently</p>
-
-            <div class="actions">
-
-                <a class="btn" href="login.php">Login</a>
-                <a class="btn outline" href="register.php">Register</a>
-
-            </div>
+        <div class="welcome-buttons">
+            <a href="login.php" class="btn">Login</a>
+            <a href="register.php" class="btn btn-secondary">Register</a>
         </div>
-    </body>
-</html>
+    </div>
+</div>
+
+<?php require '../templates/footer.php'; ?>
