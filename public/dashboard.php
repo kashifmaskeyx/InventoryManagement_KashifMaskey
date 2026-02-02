@@ -44,9 +44,7 @@ $totalValue = $totalValue->fetchColumn();
     </div>
 </div>
 
-<!-- =========================
-     DASHBOARD PANELS (unchanged)
-========================= -->
+
 <div class="dashboard-grid">
     <div class="panel">
         <h3>⚠ Low Stock Alerts</h3>
