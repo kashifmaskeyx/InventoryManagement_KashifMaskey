@@ -15,5 +15,4 @@ try {
 } catch (PDOException $e) {
     die("DB Error: " . $e->getMessage());
 }
-
-
+?>
